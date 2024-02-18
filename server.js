@@ -16,35 +16,24 @@ const server = app.listen(port, () => {
 });
 
 const io = require("socket.io")(server, {
-  pingTimeout: 60000,
   cors: {
     origin: "http://localhost:3000",
+    credentials: true,
   },
 });
 
 io.on("connection", (socket) => {
-  console.log("connected to socket.io");
-  let userId = "";
-  
-  socket.on("setup", (userData) => {
-    socket.join(userData._id);
-    socket.emit("connected");
-    userId = userData._id;
+  socket.on("join-user", (userId) => {
+    socket.emit("me", "Welcome to Chat App - " + userId);
   });
 
-  socket.on("join room chat", (data) => {
-    socket.join(data);
-    console.log("User Joined Room: " + data);
+  socket.on("join-room", (roomId) => {
+    socket.join(roomId);
+    console.log("User Joined Room: " + roomId);
   });
 
   socket.on("new message", (data) => {
-    const chat_room = data.room;
-    const sendData = data.data;
-
-    chat_room.users.forEach((user) => {
-      if (user._id != data.data.user._id) {
-        socket.in(user._id).emit("received", sendData);
-      }
-    });
+    // send send to all users in the room
+    socket.to(data.room).emit("received", data);
   });
 });
