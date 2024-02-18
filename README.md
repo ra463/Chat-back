@@ -20,6 +20,9 @@ To get started with this project, you'll need to follow these steps:
    PORT=4000
    JWT_SECRET=<some random string>
    JWT_EXPIRE=2D
+   CLOUDINARY_NAME=<your cloudinary credential>
+   CLOUDINARY_API_KEY=<your cloudinary credential>
+   CLOUDINARY_API_SECRET=<your cloudinary credential>
    ```
 
 ## Start Project
