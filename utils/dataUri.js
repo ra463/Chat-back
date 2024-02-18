@@ -1,9 +1,9 @@
 const DatauriParser = require("datauri/parser");
 const path = require("path");
 
+const parser = new DatauriParser();
 exports.getDataUri = async (file) => {
-  const parser = new DatauriParser();
   const pathName = path.extname(file.originalname).toString();
-
-  return parser.format(pathName, file.buffer);
+  const uri = parser.format(pathName, file.buffer);
+  return uri;
 };

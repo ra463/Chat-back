@@ -29,6 +29,8 @@ const schema = new mongoose.Schema(
     mobile: {
       type: Number,
       required: [true, "Please enter your mobile number"],
+      minLength: [10, "Mobile number must be of 10 digits"],
+      maxLength: [10, "Mobile number must be of 10 digits"],
       unique: [true, "Mobile number already exists"],
       trim: true,
     },

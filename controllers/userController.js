@@ -73,6 +73,20 @@ exports.updateProfile = catchAsyncError(async (req, res, next) => {
   if (!user) return next(new ErrorHandler("User not found", 404));
 
   const { name, email, mobile } = req.body;
+
+  const already_exists = await User.findOne({
+    $or: [{ email: { $regex: new RegExp(`^${email}$`, "i") } }, { mobile }],
+  });
+
+  if (already_exists && already_exists._id.toString() !== req.userId) {
+    return next(
+      new ErrorHandler(
+        `${already_exists.email ? "Email" : "Mobile"} already exists`,
+        400
+      )
+    );
+  }
+
   if (name) user.name = name;
   if (email) user.email = email;
   if (mobile) user.mobile = mobile;
@@ -80,6 +94,7 @@ exports.updateProfile = catchAsyncError(async (req, res, next) => {
   await user.save();
   res.status(200).json({
     success: true,
+    message: "Profile Details updated",
     user,
   });
 });
@@ -91,7 +106,7 @@ exports.updateAvatar = catchAsyncError(async (req, res, next) => {
   const user = await User.findById(req.userId);
   if (!user) return next(new ErrorHandler("User not found", 404));
 
-  const fileUri = getDataUri(file);
+  const fileUri = await getDataUri(file);
   const myCloud = await cloudinary.v2.uploader.upload(fileUri.content);
 
   user.avatar = myCloud.secure_url;
@@ -100,5 +115,7 @@ exports.updateAvatar = catchAsyncError(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
+    message: "Profile picture updated",
+    user,
   });
 });
